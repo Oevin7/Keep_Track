@@ -1,23 +1,24 @@
 import customtkinter as ctk
 from Dependencies import Frame_Gen as Frm
 from Dependencies import Click_Handling as Ch
-import time
-
-ctk.set_default_color_theme("green")
-ctk.set_appearance_mode("green")
 
 
 class Todo:
 
-    def __init__(self):
+    def __init__(self, window):
         # Window for program
-        self.window = ctk.CTk()
-        self.window.title("Todo List")
-        self.window.geometry("750x500")
+        self.window = window
 
         # Entry Variables
         self.task_added = ctk.StringVar()
         self.task_deleted = ctk.StringVar()
+
+        # self.ui_settings = ctk.CTkComboBox(self.window, values=["blue", "dark-blue", "green"], command=self.ui_change)
+        # self.ui_theme = self.ui_change()
+
+        ctk.set_default_color_theme("dark-blue")
+        ctk.set_appearance_mode("dark-blue")
+
 
         # Booleans to control UI
         self.add_task_on = False
@@ -25,6 +26,7 @@ class Todo:
 
         # The list the label displays
         self.tdo_lst = {}
+        self.tdo_lst_del = {}
         self.count = 0
 
         # Frame for the entries and buttons
@@ -52,8 +54,8 @@ class Todo:
         self.lbl_frame["relief"] = "sunken"
         self.lbl_frame.pack(padx=10, pady=10)
 
-        self.timed_lbl = ctk.CTkLabel()
         self.timed_lbl_frame = ctk.CTkFrame(self.window)
+        self.timed_lbl = ctk.CTkLabel(self.timed_lbl_frame, font=("Sunny Spells Basic", 18))
 
         self.labl = ctk.CTkLabel(self.lbl_frame, text="", font=("Sunny Spells Basic", 20))
         self.labl.pack()
@@ -77,8 +79,7 @@ class Todo:
 
         self.btnfrm.pack(pady=10)
 
-        # Window
-        self.window.mainloop()
+        # self.ui_settings.pack(side=ctk.BOTTOM)
 
     # Displays the prompt to add tasks
     def add_task_prompt(self):
@@ -89,8 +90,11 @@ class Todo:
             self.add_prompt.enter_bind(self.add_task)
             self.add_task_on = True
 
-    def dict_count(self):
+    def dict_count_add(self):
         self.count += 1
+
+    def dict_count_minus(self):
+        self.count -= 1
 
     # Adds the task the user enters into the prompt
     def add_task(self):
@@ -98,7 +102,7 @@ class Todo:
         task = task.lower()
 
         if task not in self.tdo_lst:
-            self.dict_count()
+            self.dict_count_add()
             self.tdo_lst[self.count] = task
 
             self.labl.configure(text=str(self.tdo_lst)[1:-1])
@@ -118,14 +122,40 @@ class Todo:
             self.del_task_on = True
 
     def delete_task(self):
+        task_to_delete = None
         for task_num, task in self.tdo_lst.items():
             if task in self.tdo_lst.values():
-                self.tdo_lst.pop(task_num)
+                task_to_delete = task_num
+                break
+
+        if task_to_delete is not None:
+            self.dict_count_minus()
+            del_tsk = self.tdo_lst.pop(task_to_delete)
+            self.labl.configure(text=str(self.tdo_lst_del)[1:-1])
+            self.timed_lbl.configure(text=del_tsk)
+            self.show_message(del_tsk)
+
         self.etr_frm.pack_forget()
         self.delete_prompt.pack_forget()
         self.delete_prompt.delete(0, ctk.END)
         self.etr_del_btn.pack_forget()
         self.del_task_on = False
 
+    def show_message(self, text):
+        self.timed_lbl.configure(text="Task deleted: " + text)
+        self.timed_lbl_frame.pack()
+        self.timed_lbl.pack()
+        self.timed_lbl_frame.after(2000, self.timed_lbl_frame.destroy)
 
-Todo()
+    def ui_change(self):
+        pass
+
+
+if __name__ == "__main__":
+    window = ctk.CTk()
+    window.title("Todo List")
+    window.geometry("750x500")
+
+    Todo(window)
+
+    window.mainloop()
