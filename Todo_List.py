@@ -1,6 +1,17 @@
 import customtkinter as ctk
 from Dependencies import Frame_Gen as Frm
 from Dependencies import Click_Handling as Ch
+import enum
+
+
+class Process(enum.Enum):
+    BLANK = ""
+    ADD = "add"
+    DEL = "del"
+    MAN = "manage"
+    NOTES = "notes"
+    CAL = "calender"
+    TDO = "todo"
 
 
 class Todo:
@@ -20,9 +31,8 @@ class Todo:
         ctk.set_appearance_mode("dark-blue")
 
         # Booleans to control UI
-        self.add_task_on = False
-        self.del_task_on = False
-        self.man_task_on = False
+        self.task_process = Process.BLANK
+        self.other_process = False
 
         # The list the label displays
         self.tdo_lst = {}
@@ -87,12 +97,13 @@ class Todo:
 
     # Displays the prompt to add tasks
     def add_task_prompt(self):
-        if not self.del_task_on or not self.man_task_on:
-            self.etr_frm.pack()
-            self.add_prompt.pack()
-            self.etr_add_btn.pack(side=ctk.RIGHT)
-            self.add_prompt.enter_bind(self.add_task)
-            self.add_task_on = True
+        if self.task_process != Process.ADD and not self.other_process:
+                self.etr_frm.pack()
+                self.add_prompt.pack()
+                self.etr_add_btn.pack(side=ctk.RIGHT)
+                self.add_prompt.enter_bind(self.add_task)
+                self.task_process = Process.ADD
+                self.other_process = True
 
     def dict_count_add(self):
         self.count += 1
@@ -115,15 +126,17 @@ class Todo:
             self.etr_add_btn.pack_forget()
             self.add_prompt.pack_forget()
             self.add_prompt.delete(0, ctk.END)
-            self.add_task_on = False
+            self.task_process = Process.BLANK
+            self.other_process = False
 
     # Deletes the task the user prompts
     def delete_task_prompt(self):
-        if not self.add_task_on or self.man_task_on:
-            self.etr_frm.pack()
-            self.delete_prompt.pack()
-            self.etr_del_btn.pack()
-            self.del_task_on = True
+        if self.task_process != Process.DEL and not self.other_process:
+                self.etr_frm.pack()
+                self.delete_prompt.pack()
+                self.etr_del_btn.pack()
+                self.task_process = Process.DEL
+                self.other_process = True
 
     def delete_task(self):
         task_to_delete = None
@@ -143,14 +156,16 @@ class Todo:
         self.delete_prompt.pack_forget()
         self.delete_prompt.delete(0, ctk.END)
         self.etr_del_btn.pack_forget()
-        self.del_task_on = False
+        self.task_process = Process.BLANK
+        self.other_process = False
 
     def manage_task_prompt(self):
-        if not self.add_task_on or not self.del_task_on:
-            self.etr_frm.pack()
-            self.manage_prompt.pack()
-            self.etr_man_btn.pack()
-            self.man_task_on = True
+        if self.task_process != Process.MAN and not self.other_process:
+                self.etr_frm.pack()
+                self.manage_prompt.pack()
+                self.etr_man_btn.pack()
+                self.task_process = Process.MAN
+                self.other_process = True
 
     def show_message(self, text):
         self.timed_lbl.configure(text="Task deleted: " + text)
