@@ -19,10 +19,10 @@ class Todo:
         ctk.set_default_color_theme("dark-blue")
         ctk.set_appearance_mode("dark-blue")
 
-
         # Booleans to control UI
         self.add_task_on = False
         self.del_task_on = False
+        self.man_task_on = False
 
         # The list the label displays
         self.tdo_lst = {}
@@ -40,11 +40,15 @@ class Todo:
         self.etr_del_btn = ctk.CTkButton(self.etr_frm, text="Delete", width=10, height=28,
                                          command=self.delete_task)
 
+        self.etr_man_btn = ctk.CTkButton(self.etr_frm, text="Manage", width=10, height=28)
+
         # The entry itself
         self.add_prompt = Ch.CstEntry(master=self.window)
 
         # Delete Prompt for deleting tasks
         self.delete_prompt = Ch.CstEntry(master=self.window)
+
+        self.manage_prompt = Ch.CstEntry(master=self.window)
 
         # The label that displays the tasks
         self.labl_title = ctk.CTkLabel(self.window, text="Uncompleted Tasks", font=("Sunny Spells Basic", 50))
@@ -74,7 +78,7 @@ class Todo:
         self.btn_del.grid(row=0, column=1, padx=5, pady=5)
 
         self.btn_manage = ctk.CTkButton(self.btnfrm, height=35, width=150, text="Manage Tasks",
-                                        font=("Sunny Spells Basic", 25))
+                                        font=("Sunny Spells Basic", 25), command=self.manage_task_prompt)
         self.btn_manage.grid(row=0, column=2, padx=5, pady=5)
 
         self.btnfrm.pack(pady=10)
@@ -83,7 +87,7 @@ class Todo:
 
     # Displays the prompt to add tasks
     def add_task_prompt(self):
-        if not self.del_task_on:
+        if not self.del_task_on or not self.man_task_on:
             self.etr_frm.pack()
             self.add_prompt.pack()
             self.etr_add_btn.pack(side=ctk.RIGHT)
@@ -115,7 +119,7 @@ class Todo:
 
     # Deletes the task the user prompts
     def delete_task_prompt(self):
-        if not self.add_task_on:
+        if not self.add_task_on or self.man_task_on:
             self.etr_frm.pack()
             self.delete_prompt.pack()
             self.etr_del_btn.pack()
@@ -140,6 +144,13 @@ class Todo:
         self.delete_prompt.delete(0, ctk.END)
         self.etr_del_btn.pack_forget()
         self.del_task_on = False
+
+    def manage_task_prompt(self):
+        if not self.add_task_on or not self.del_task_on:
+            self.etr_frm.pack()
+            self.manage_prompt.pack()
+            self.etr_man_btn.pack()
+            self.man_task_on = True
 
     def show_message(self, text):
         self.timed_lbl.configure(text="Task deleted: " + text)
