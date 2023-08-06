@@ -1,5 +1,4 @@
 import customtkinter as ctk
-from Dependencies import Frame_Gen as Frm
 from Dependencies import Click_Handling as Ch
 import enum
 
@@ -30,6 +29,9 @@ class Todo:
         ctk.set_default_color_theme("dark-blue")
         ctk.set_appearance_mode("dark-blue")
 
+        self.main_frame = ctk.CTkFrame(self.window, height=500, width=650)
+        self.main_frame["relief"] = "sunken"
+
         # Booleans to control UI
         self.task_process = Process.BLANK
         self.other_process = False
@@ -40,7 +42,7 @@ class Todo:
         self.count = 0
 
         # Frame for the entries and buttons
-        self.etr_frm = Frm.frame_gen(self.window)
+        self.etr_frm = ctk.CTkFrame(self.main_frame)
 
         # Entry button to add task
         self.etr_add_btn = ctk.CTkButton(self.etr_frm, text="Add", width=10, height=28, command=self.add_task)
@@ -53,57 +55,60 @@ class Todo:
         self.etr_man_btn = ctk.CTkButton(self.etr_frm, text="Manage", width=10, height=28)
 
         # The entry itself
-        self.add_prompt = Ch.CstEntry(master=self.window)
+        self.add_prompt = Ch.CstEntry(master=self.etr_frm)
 
         # Delete Prompt for deleting tasks
-        self.delete_prompt = Ch.CstEntry(master=self.window)
+        self.delete_prompt = Ch.CstEntry(master=self.etr_frm)
 
-        self.manage_prompt = Ch.CstEntry(master=self.window)
+        self.manage_prompt = Ch.CstEntry(master=self.etr_frm)
 
         # The label that displays the tasks
-        self.labl_title = ctk.CTkLabel(self.window, text="Uncompleted Tasks", font=("Sunny Spells Basic", 50))
-        self.labl_title.pack(padx=20, pady=20)
 
-        self.lbl_frame = ctk.CTkFrame(self.window, border_width=2, width=500, height=200)
+        self.lbl_frame = ctk.CTkFrame(self.main_frame, border_width=2, width=100, height=200)
         self.lbl_frame["relief"] = "sunken"
-        self.lbl_frame.pack(padx=10, pady=10)
+        self.lbl_frame.pack(side=ctk.RIGHT)
 
-        self.timed_lbl_frame = ctk.CTkFrame(self.window)
+        self.labl_title = ctk.CTkLabel(self.lbl_frame, text="Uncompleted Tasks", font=("Sunny Spells Basic", 50))
+        self.labl_title.pack()
+
+        self.timed_lbl_frame = ctk.CTkFrame(self.main_frame)
         self.timed_lbl = ctk.CTkLabel(self.timed_lbl_frame, font=("Sunny Spells Basic", 18))
 
         self.labl = ctk.CTkLabel(self.lbl_frame, text="", font=("Sunny Spells Basic", 20))
         self.labl.pack()
 
         # button frame and buttons
-        self.btnfrm = Frm.frame_gen(self.window)
+        self.btnfrm = ctk.CTkFrame(self.main_frame, height= 100, width=100)
 
         self.btn_add = ctk.CTkButton(self.btnfrm, height=35, width=150, text="Add Task",
                                      font=("Sunny Spells Basic", 25),
                                      command=self.add_task_prompt)
-        self.btn_add.grid(row=0, column=0, padx=5, pady=5)
+        self.btn_add.pack(pady=2)
 
         self.btn_del = ctk.CTkButton(self.btnfrm, height=35, width=150, text="Delete Task",
                                      font=("Sunny Spells Basic", 25),
                                      command=self.delete_task_prompt)
-        self.btn_del.grid(row=0, column=1, padx=5, pady=5)
+        self.btn_del.pack(pady=2)
 
         self.btn_manage = ctk.CTkButton(self.btnfrm, height=35, width=150, text="Manage Tasks",
                                         font=("Sunny Spells Basic", 25), command=self.manage_task_prompt)
-        self.btn_manage.grid(row=0, column=2, padx=5, pady=5)
+        self.btn_manage.pack(pady=2)
 
-        self.btnfrm.pack(pady=10)
+        self.btnfrm.pack(padx=5, pady=10)
+
+        self.main_frame.pack()
 
         # self.ui_settings.pack(side=ctk.BOTTOM)
 
     # Displays the prompt to add tasks
     def add_task_prompt(self):
         if self.task_process != Process.ADD and not self.other_process:
-                self.etr_frm.pack()
-                self.add_prompt.pack()
-                self.etr_add_btn.pack(side=ctk.RIGHT)
-                self.add_prompt.enter_bind(self.add_task)
-                self.task_process = Process.ADD
-                self.other_process = True
+            self.etr_frm.pack()
+            self.add_prompt.pack()
+            self.etr_add_btn.pack()
+            self.add_prompt.enter_bind(self.add_task)
+            self.task_process = Process.ADD
+            self.other_process = True
 
     def dict_count_add(self):
         self.count += 1
@@ -132,11 +137,11 @@ class Todo:
     # Deletes the task the user prompts
     def delete_task_prompt(self):
         if self.task_process != Process.DEL and not self.other_process:
-                self.etr_frm.pack()
-                self.delete_prompt.pack()
-                self.etr_del_btn.pack()
-                self.task_process = Process.DEL
-                self.other_process = True
+            self.etr_frm.pack()
+            self.delete_prompt.pack()
+            self.etr_del_btn.pack()
+            self.task_process = Process.DEL
+            self.other_process = True
 
     def delete_task(self):
         task_to_delete = None
@@ -161,15 +166,23 @@ class Todo:
 
     def manage_task_prompt(self):
         if self.task_process != Process.MAN and not self.other_process:
-                self.etr_frm.pack()
-                self.manage_prompt.pack()
-                self.etr_man_btn.pack()
-                self.task_process = Process.MAN
-                self.other_process = True
+            self.etr_frm.pack()
+            self.manage_prompt.pack()
+            self.etr_man_btn.pack()
+            self.task_process = Process.MAN
+            self.other_process = True
+
+    def manage_task(self):
+        task = self.manage_prompt.get()
+        task_to_manage = None
+        task_tags = []
+        for task_num, task in self.tdo_lst.items():
+            if task_to_manage == task:
+                pass
 
     def show_message(self, text):
         self.timed_lbl.configure(text="Task deleted: " + text)
-        self.timed_lbl_frame.pack()
+        self.timed_lbl_frame.pack(side=ctk.BOTTOM)
         self.timed_lbl.pack()
         self.timed_lbl_frame.after(2000, self.timed_lbl_frame.destroy)
 
@@ -180,8 +193,17 @@ class Todo:
 if __name__ == "__main__":
     window = ctk.CTk()
     window.title("Todo List")
-    window.geometry("750x500")
 
+    width = 650
+    height = 550
+
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+
+    x = (screen_width / 2) - (width / 2)
+    y = (screen_height / 2) - (height / 2)
+
+    window.geometry('%dx%d+%d+%d' % (width, height, x, y))
     Todo(window)
 
     window.mainloop()
