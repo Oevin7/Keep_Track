@@ -145,8 +145,11 @@ class Todo:
 
     def delete_task(self):
         task_to_delete = None
+
         for task_num, task in self.tdo_lst.items():
-            if task in self.tdo_lst.values():
+            print(task_num, task)
+            task_to_delete = self.prompt.get()
+            if task == task_to_delete:
                 task_to_delete = task_num
                 break
 
@@ -191,6 +194,7 @@ class Todo:
 
 
 if __name__ == "__main__":
+<<<<<<< Updated upstream
     window = ctk.CTk()
     window.title("Todo List")
 
@@ -205,5 +209,12 @@ if __name__ == "__main__":
 
     window.geometry('%dx%d+%d+%d' % (width, height, x, y))
     Todo(window)
+=======
+    root = ctk.CTk()
+    root.title("Todo List")
+    root.geometry("500x700")
 
-    window.mainloop()
+    Todo(root)
+>>>>>>> Stashed changes
+
+    root.mainloop()
