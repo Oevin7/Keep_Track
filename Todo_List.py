@@ -1,5 +1,4 @@
 import customtkinter as ctk
-from Dependencies import Click_Handling as Ch
 import enum
 
 
@@ -28,9 +27,7 @@ class Todo:
 
         ctk.set_default_color_theme("dark-blue")
         ctk.set_appearance_mode("dark-blue")
-
-        self.main_frame = ctk.CTkFrame(self.window, height=500, width=650)
-        self.main_frame["relief"] = "sunken"
+        self.font = "Alice Yotsuba Inc."
 
         # Booleans to control UI
         self.task_process = Process.BLANK
@@ -41,72 +38,46 @@ class Todo:
         self.tdo_lst_del = {}
         self.count = 0
 
-        # Frame for the entries and buttons
-        self.etr_frm = ctk.CTkFrame(self.main_frame)
+        self.main_frame = ctk.CTkFrame(self.window, height=700, width=500)
 
-        # Entry button to add task
-        self.etr_add_btn = ctk.CTkButton(self.etr_frm, text="Add", width=10, height=28, command=self.add_task)
-        # enter_clicked = Ch.enter_click(etr=self.etr_add_btn, )
+        self.btn_frame = ctk.CTkFrame(self.main_frame, height=120)
+        self.btn_frame.place(x=0)
 
-        # Entry button to delete task
-        self.etr_del_btn = ctk.CTkButton(self.etr_frm, text="Delete", width=10, height=28,
-                                         command=self.delete_task)
+        self.add_btn = ctk.CTkButton(self.btn_frame, text="Add", font=(self.font, 16), command=self.add_task_prompt)
+        self.add_btn.place(x=30, y=15)
 
-        self.etr_man_btn = ctk.CTkButton(self.etr_frm, text="Manage", width=10, height=28)
+        self.del_btn = ctk.CTkButton(self.btn_frame, text="Delete", font=(self.font, 16), command=self.delete_task_prompt)
+        self.del_btn.place(x=30, y=45)
 
-        # The entry itself
-        self.add_prompt = Ch.CstEntry(master=self.etr_frm)
+        self.man_btn = ctk.CTkButton(self.btn_frame, text="Manage", font=(self.font, 16))
+        self.man_btn.place(x=30, y=75)
 
-        # Delete Prompt for deleting tasks
-        self.delete_prompt = Ch.CstEntry(master=self.etr_frm)
+        self.etr_frame = ctk.CTkFrame(self.main_frame, height=50, width=100)
+        self.prompt = ctk.CTkEntry(self.etr_frame)
+        self.etr_add_btn = ctk.CTkButton(self.etr_frame, text="Add", font=(self.font, 14), command=self.add_task)
 
-        self.manage_prompt = Ch.CstEntry(master=self.etr_frm)
+        self.etr_del_btn = ctk.CTkButton(self.etr_frame, text="Delete", font=(self.font, 14), command=self.delete_task)
 
-        # The label that displays the tasks
+        self.lst_frame = ctk.CTkFrame(self.main_frame, width=260)
+        self.lst_frame.pack_propagate(False)
+        self.lst_frame.place(x=220)
 
-        self.lbl_frame = ctk.CTkFrame(self.main_frame, border_width=2, width=100, height=200)
-        self.lbl_frame["relief"] = "sunken"
-        self.lbl_frame.pack(side=ctk.RIGHT)
+        self.timed_lbl_frame = ctk.CTkFrame(self.main_frame, height=50, width=100)
+        self.timed_lbl_frame.pack_propagate(False)
+        self.timed_lbl = ctk.CTkLabel(self.timed_lbl_frame)
 
-        self.labl_title = ctk.CTkLabel(self.lbl_frame, text="Uncompleted Tasks", font=("Sunny Spells Basic", 50))
-        self.labl_title.pack()
-
-        self.timed_lbl_frame = ctk.CTkFrame(self.main_frame)
-        self.timed_lbl = ctk.CTkLabel(self.timed_lbl_frame, font=("Sunny Spells Basic", 18))
-
-        self.labl = ctk.CTkLabel(self.lbl_frame, text="", font=("Sunny Spells Basic", 20))
+        self.uncompleted = ctk.CTkLabel(self.lst_frame, text="Uncompleted Tasks:", compound="center",  font=(self.font, 20))
+        self.labl = ctk.CTkLabel(self.lst_frame, text="", font=(self.font, 16), wraplength=220, justify=ctk.LEFT)
+        self.uncompleted.pack(pady=10)
         self.labl.pack()
-
-        # button frame and buttons
-        self.btnfrm = ctk.CTkFrame(self.main_frame, height= 100, width=100)
-
-        self.btn_add = ctk.CTkButton(self.btnfrm, height=35, width=150, text="Add Task",
-                                     font=("Sunny Spells Basic", 25),
-                                     command=self.add_task_prompt)
-        self.btn_add.pack(pady=2)
-
-        self.btn_del = ctk.CTkButton(self.btnfrm, height=35, width=150, text="Delete Task",
-                                     font=("Sunny Spells Basic", 25),
-                                     command=self.delete_task_prompt)
-        self.btn_del.pack(pady=2)
-
-        self.btn_manage = ctk.CTkButton(self.btnfrm, height=35, width=150, text="Manage Tasks",
-                                        font=("Sunny Spells Basic", 25), command=self.manage_task_prompt)
-        self.btn_manage.pack(pady=2)
-
-        self.btnfrm.pack(padx=5, pady=10)
-
         self.main_frame.pack()
-
-        # self.ui_settings.pack(side=ctk.BOTTOM)
 
     # Displays the prompt to add tasks
     def add_task_prompt(self):
         if self.task_process != Process.ADD and not self.other_process:
-            self.etr_frm.pack()
-            self.add_prompt.pack()
-            self.etr_add_btn.pack()
-            self.add_prompt.enter_bind(self.add_task)
+            self.etr_frame.place(x=30, y=130)
+            self.prompt.pack()
+            self.etr_add_btn.pack(side=ctk.RIGHT)
             self.task_process = Process.ADD
             self.other_process = True
 
@@ -118,7 +89,7 @@ class Todo:
 
     # Adds the task the user enters into the prompt
     def add_task(self):
-        task = self.add_prompt.get()
+        task = self.prompt.get()
         task = task.lower()
 
         if task not in self.tdo_lst:
@@ -127,25 +98,24 @@ class Todo:
 
             self.labl.configure(text=str(self.tdo_lst)[1:-1])
 
-            self.etr_frm.pack_forget()
+            self.etr_frame.place_forget()
             self.etr_add_btn.pack_forget()
-            self.add_prompt.pack_forget()
-            self.add_prompt.delete(0, ctk.END)
+            self.prompt.pack_forget()
+            self.prompt.delete(0, ctk.END)
             self.task_process = Process.BLANK
             self.other_process = False
 
     # Deletes the task the user prompts
     def delete_task_prompt(self):
         if self.task_process != Process.DEL and not self.other_process:
-            self.etr_frm.pack()
-            self.delete_prompt.pack()
+            self.etr_frame.place(x=30, y=130)
+            self.prompt.pack()
             self.etr_del_btn.pack()
             self.task_process = Process.DEL
             self.other_process = True
 
     def delete_task(self):
         task_to_delete = None
-
         for task_num, task in self.tdo_lst.items():
             print(task_num, task)
             task_to_delete = self.prompt.get()
@@ -160,16 +130,16 @@ class Todo:
             self.timed_lbl.configure(text=del_tsk)
             self.show_message(del_tsk)
 
-        self.etr_frm.pack_forget()
-        self.delete_prompt.pack_forget()
-        self.delete_prompt.delete(0, ctk.END)
+        self.etr_frame.place_forget()
+        self.prompt.pack_forget()
+        self.prompt.delete(0, ctk.END)
         self.etr_del_btn.pack_forget()
         self.task_process = Process.BLANK
         self.other_process = False
 
     def manage_task_prompt(self):
         if self.task_process != Process.MAN and not self.other_process:
-            self.etr_frm.pack()
+            self.etr_frame.place(x=30, y=130)
             self.manage_prompt.pack()
             self.etr_man_btn.pack()
             self.task_process = Process.MAN
@@ -185,9 +155,10 @@ class Todo:
 
     def show_message(self, text):
         self.timed_lbl.configure(text="Task deleted: " + text)
-        self.timed_lbl_frame.pack(side=ctk.BOTTOM)
+        self.timed_lbl_frame.place(x=30, y=150)
         self.timed_lbl.pack()
-        self.timed_lbl_frame.after(2000, self.timed_lbl_frame.destroy)
+        self.timed_lbl_frame.after(2000, self.timed_lbl_frame.place_forget)
+        self.timed_lbl.selection_clear()
 
     def ui_change(self):
         pass
