@@ -194,27 +194,10 @@ class Todo:
 
 
 if __name__ == "__main__":
-<<<<<<< Updated upstream
-    window = ctk.CTk()
-    window.title("Todo List")
-
-    width = 650
-    height = 550
-
-    screen_width = window.winfo_screenwidth()
-    screen_height = window.winfo_screenheight()
-
-    x = (screen_width / 2) - (width / 2)
-    y = (screen_height / 2) - (height / 2)
-
-    window.geometry('%dx%d+%d+%d' % (width, height, x, y))
-    Todo(window)
-=======
     root = ctk.CTk()
     root.title("Todo List")
     root.geometry("500x700")
 
     Todo(root)
->>>>>>> Stashed changes
 
     root.mainloop()
