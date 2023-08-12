@@ -26,7 +26,7 @@ class Todo:
         # self.ui_theme = self.ui_change()
 
         ctk.set_default_color_theme("dark-blue")
-        ctk.set_appearance_mode("dark-blue")
+        ctk.set_appearance_mode("dark")
         self.font = "Alice Yotsuba Inc."
 
         # Booleans to control UI
