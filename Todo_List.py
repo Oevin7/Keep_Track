@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import enum
+import json
 
 
 class Process(enum.Enum):
@@ -22,6 +23,8 @@ class Todo:
         self.task_added = ctk.StringVar()
         self.task_deleted = ctk.StringVar()
 
+        self.user_data = self.on_open()
+
         # self.ui_settings = ctk.CTkComboBox(self.window, values=["blue", "dark-blue", "green"], command=self.ui_change)
         # self.ui_theme = self.ui_change()
 
@@ -34,7 +37,7 @@ class Todo:
         self.other_process = False
 
         # The list the label displays
-        self.tdo_lst = {}
+        self.tdo_lst = self.user_data
         self.tdo_lst_del = {}
         self.count = 0
 
@@ -46,7 +49,8 @@ class Todo:
         self.add_btn = ctk.CTkButton(self.btn_frame, text="Add", font=(self.font, 16), command=self.add_task_prompt)
         self.add_btn.place(x=30, y=15)
 
-        self.del_btn = ctk.CTkButton(self.btn_frame, text="Delete", font=(self.font, 16), command=self.delete_task_prompt)
+        self.del_btn = ctk.CTkButton(self.btn_frame, text="Delete", font=(self.font, 16),
+                                     command=self.delete_task_prompt)
         self.del_btn.place(x=30, y=45)
 
         self.man_btn = ctk.CTkButton(self.btn_frame, text="Manage", font=(self.font, 16))
@@ -58,6 +62,8 @@ class Todo:
 
         self.etr_del_btn = ctk.CTkButton(self.etr_frame, text="Delete", font=(self.font, 14), command=self.delete_task)
 
+        self.etr_man_btn = ctk.CTkButton(self.etr_frame, text="Manage", font=(self.font, 14), command=self.delete_task)
+
         self.lst_frame = ctk.CTkFrame(self.main_frame, width=260)
         self.lst_frame.pack_propagate(False)
         self.lst_frame.place(x=220)
@@ -66,11 +72,14 @@ class Todo:
         self.timed_lbl_frame.pack_propagate(False)
         self.timed_lbl = ctk.CTkLabel(self.timed_lbl_frame)
 
-        self.uncompleted = ctk.CTkLabel(self.lst_frame, text="Uncompleted Tasks:", compound="center",  font=(self.font, 20))
+        self.uncompleted = ctk.CTkLabel(self.lst_frame, text="Uncompleted Tasks:", compound="center",
+                                        font=(self.font, 20))
         self.labl = ctk.CTkLabel(self.lst_frame, text="", font=(self.font, 16), wraplength=220, justify=ctk.LEFT)
         self.uncompleted.pack(pady=10)
         self.labl.pack()
         self.main_frame.pack()
+
+        self.window.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     # Displays the prompt to add tasks
     def add_task_prompt(self):
@@ -119,6 +128,7 @@ class Todo:
         for task_num, task in self.tdo_lst.items():
             print(task_num, task)
             task_to_delete = self.prompt.get()
+            task_to_delete = task_to_delete.lower()
             if task == task_to_delete:
                 task_to_delete = task_num
                 break
@@ -140,13 +150,13 @@ class Todo:
     def manage_task_prompt(self):
         if self.task_process != Process.MAN and not self.other_process:
             self.etr_frame.place(x=30, y=130)
-            self.manage_prompt.pack()
+            self.prompt.pack()
             self.etr_man_btn.pack()
             self.task_process = Process.MAN
             self.other_process = True
 
     def manage_task(self):
-        task = self.manage_prompt.get()
+        task = self.prompt.get()
         task_to_manage = None
         task_tags = []
         for task_num, task in self.tdo_lst.items():
@@ -162,6 +172,20 @@ class Todo:
 
     def ui_change(self):
         pass
+
+    @staticmethod
+    def save_data(data):
+        with open("userdata.json", "w") as file:
+            json.dump(data, file)
+
+    def on_closing(self):
+        self.save_data(self.tdo_lst)
+        self.window.destroy()
+
+    def on_open(self):
+        with open("userdata.json", "r") as file:
+            data = json.load(file)
+        return data
 
 
 if __name__ == "__main__":

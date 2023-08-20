@@ -13,10 +13,17 @@ class Notes:
         ctk.set_appearance_mode("dark")
         self.font = "Alice Yotsuba Inc."
 
-        self.notes_window = ctk.CTkToplevel(self.window)
+        self.notes_window = None
+
+        self.label_key = None
+
+        self.opened_note_text = None
 
         self.labels = {}
         self.label_count = 0
+
+        self.new_label = None
+        self.edited_label = None
 
         self.main_frame = ctk.CTkFrame(self.window, height=700, width=500)
 
@@ -42,7 +49,6 @@ class Notes:
         # self.note_box.place(x=0)
 
         self.main_frame.pack()
-        self.main_frame.pack()
 
     def count_up(self):
         self.label_count += 1
@@ -54,17 +60,40 @@ class Notes:
         self.note_frame.pack()
 
     def label_clicked(self, event):
+        clicked_label = event.widget.master
+        clicked_key = None
+
+        for key, label in self.labels.items():
+            if label == clicked_label:
+                clicked_key = key
+                break
+
+        if clicked_key is not None:
+            self.edited_label = self.labels[clicked_key] # Store the clicked label
+            self.opened_note_text = self.labels[clicked_key]
+
+            # Open the notes window and update label text
+            self.open_notes_window()
+
+    def open_notes_window(self):
+        self.notes_window = ctk.CTkToplevel(self.window)
         self.notes_window.title("Edit Notes")
 
         notes_text = tkinter.Text(self.notes_window)
+        note_content = self.opened_note_text.cget("text")
         notes_text.pack()
+        notes_text.insert("1.0", note_content)
 
         save_button = ctk.CTkButton(self.notes_window, text="Save",
-                                    command=lambda: self.add_note(notes_text.get("1.0", "end-1c")))
+                                    command=lambda: self.update_label_text(notes_text.get("1.0", "end-1c")))
         save_button.pack()
 
         cancel_button = tkinter.Button(self.notes_window, text="Cancel", command=self.notes_window.destroy)
         cancel_button.pack()
+
+    def update_label_text(self, new_text):
+        self.edited_label.configure(text=new_text)
+        self.notes_window.destroy()
 
     def add_note(self, new_note=None):
         self.note_frame.pack_forget()
@@ -72,14 +101,16 @@ class Notes:
         self.count_up()
         if new_note is None:
             new_note = self.note_box.get("1.0", ctk.END)
-        self.saved_note = new_note
-        new_label = ctk.CTkLabel(self.window, text=new_note)
-        new_label.bind("<Button-1>", self.label_clicked)
-        new_label.pack()
-        self.labels[self.label_count] = new_label
+            self.saved_note = new_note
+            self.new_label = ctk.CTkLabel(self.main_frame, text=new_note)
+            self.new_label.bind("<Button-1>", self.label_clicked)
+            self.new_label.pack()
+            self.labels[self.label_count] = self.new_label
 
         if hasattr(self, 'notes_window') and isinstance(self.notes_window, ctk.CTkToplevel):
             self.notes_window.destroy()
+
+        self.note_box.delete("1.0", ctk.END)
 
 
 if __name__ == "__main__":
