@@ -1,5 +1,7 @@
 import tkinter
 import customtkinter as ctk
+import Todo_List
+import Calender
 
 
 # import ttkthemes
@@ -29,6 +31,16 @@ class Notes:
         self.edited_label = None
 
         self.main_frame = ctk.CTkFrame(self.window, height=700, width=500)
+
+        self.menu_frame = ctk.CTkFrame(self.window, height=40, width=180)
+        self.menu_frame.pack_propagate(False)
+
+        self.todo_btn = ctk.CTkButton(self.menu_frame, text="Todo List", font=(self.font, 14), height=20, width=50, command=self.todo)
+        self.calendar_btn = ctk.CTkButton(self.menu_frame, text="Calendar", font=(self.font, 14), height=20, width=50, command=self.calendar)
+
+        self.menu_frame.pack()
+        self.todo_btn.pack(side=ctk.LEFT)
+        self.calendar_btn.pack(side=ctk.RIGHT)
 
         self.btn_frame = ctk.CTkFrame(self.main_frame)
 
@@ -119,6 +131,16 @@ class Notes:
     def label_update(self):
         for label_key, label_widget in self.labels.items():
             label_widget.configure(font=(self.font, 12), padx=10, pady=10, wraplength=200, justify=ctk.LEFT)
+
+    def todo(self):
+        self.main_frame.pack_forget()
+        Todo_List.Todo(self.window)
+        self.menu_frame.pack_forget()
+
+    def calendar(self):
+        self.main_frame.pack_forget()
+        Calender.Calender(self.window)
+        self.menu_frame.pack_forget()
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import enum
-import json
+import Notes
+import Calender
 
 
 class Process(enum.Enum):
@@ -23,7 +24,7 @@ class Todo:
         self.task_added = ctk.StringVar()
         self.task_deleted = ctk.StringVar()
 
-        self.user_data = self.on_open()
+        self.list_dates = {}
 
         # self.ui_settings = ctk.CTkComboBox(self.window, values=["blue", "dark-blue", "green"], command=self.ui_change)
         # self.ui_theme = self.ui_change()
@@ -37,11 +38,23 @@ class Todo:
         self.other_process = False
 
         # The list the label displays
-        self.tdo_lst = self.user_data
+        self.tdo_lst = {}
         self.tdo_lst_del = {}
         self.count = 0
 
         self.main_frame = ctk.CTkFrame(self.window, height=700, width=500)
+
+        self.menu_frame = ctk.CTkFrame(self.window, height=40, width=150)
+        self.menu_frame.pack_propagate(False)
+
+        self.notes_btn = ctk.CTkButton(self.menu_frame, text="Notes", font=(self.font, 14), height=20, width=50,
+                                       command=self.notes)
+        self.calendar_btn = ctk.CTkButton(self.menu_frame, text="Calendar", font=(self.font, 14), height=20, width=50,
+                                          command=self.calendar)
+
+        self.menu_frame.pack()
+        self.notes_btn.pack(side=ctk.LEFT)
+        self.calendar_btn.pack(side=ctk.RIGHT)
 
         self.btn_frame = ctk.CTkFrame(self.main_frame, height=120)
         self.btn_frame.place(x=0)
@@ -79,8 +92,6 @@ class Todo:
         self.labl.pack()
         self.main_frame.pack()
 
-        self.window.protocol("WM_DELETE_WINDOW", self.on_closing)
-
     # Displays the prompt to add tasks
     def add_task_prompt(self):
         if self.task_process != Process.ADD and not self.other_process:
@@ -98,8 +109,7 @@ class Todo:
 
     # Adds the task the user enters into the prompt
     def add_task(self):
-        task = self.prompt.get()
-        task = task.lower()
+        task = self.prompt.get().lower()
 
         if task not in self.tdo_lst:
             self.dict_count_add()
@@ -125,12 +135,14 @@ class Todo:
 
     def delete_task(self):
         task_to_delete = None
+        input_text = self.prompt.get().lower()  # Get the input text once
+        print(input_text)
+
         for task_num, task in self.tdo_lst.items():
             print(task_num, task)
-            task_to_delete = self.prompt.get()
-            task_to_delete = task_to_delete.lower()
-            if task == task_to_delete:
+            if task == input_text:  # Compare with the task number (key), not the content
                 task_to_delete = task_num
+                print(task_to_delete, task_num)
                 break
 
         if task_to_delete is not None:
@@ -170,22 +182,18 @@ class Todo:
         self.timed_lbl_frame.after(2000, self.timed_lbl_frame.place_forget)
         self.timed_lbl.selection_clear()
 
+    def notes(self):
+        self.main_frame.pack_forget()
+        Notes.Notes(self.window)
+        self.menu_frame.pack_forget()
+
+    def calendar(self):
+        self.main_frame.pack_forget()
+        Calender.Calender(self.window)
+        self.menu_frame.pack_forget()
+
     def ui_change(self):
         pass
-
-    @staticmethod
-    def save_data(data):
-        with open("userdata.json", "w") as file:
-            json.dump(data, file)
-
-    def on_closing(self):
-        self.save_data(self.tdo_lst)
-        self.window.destroy()
-
-    def on_open(self):
-        with open("userdata.json", "r") as file:
-            data = json.load(file)
-        return data
 
 
 if __name__ == "__main__":
