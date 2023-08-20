@@ -2,6 +2,9 @@ import tkinter
 import customtkinter as ctk
 
 
+# import ttkthemes
+
+
 class Notes:
 
     def __init__(self, window):
@@ -33,12 +36,12 @@ class Notes:
         self.add_btn.grid(row=0, column=0)
         self.add_btn.pack()
 
-        self.note_container = ctk.CTkFrame(self.main_frame)
+        self.note_container_frame = ctk.CTkFrame(self.main_frame)
 
         self.btn_frame.pack(pady=10)
 
         self.note_frame = ctk.CTkFrame(self.main_frame)
-        self.note_box = ctk.CTkTextbox(self.note_frame)
+        self.note_box = ctk.CTkTextbox(self.note_frame, height=100, width=200)
 
         self.note_add = ctk.CTkButton(self.note_frame, text="Add", font=(self.font, 10), command=self.add_note)
 
@@ -47,7 +50,7 @@ class Notes:
 
         # self.note_frame.place(x=150)
         # self.note_box.place(x=0)
-
+        self.note_container_frame.pack(side=ctk.BOTTOM)
         self.main_frame.pack()
 
     def count_up(self):
@@ -57,7 +60,7 @@ class Notes:
         self.label_count -= 1
 
     def add_prompt(self):
-        self.note_frame.pack()
+        self.note_frame.pack(side=ctk.TOP)
 
     def label_clicked(self, event):
         clicked_label = event.widget.master
@@ -69,7 +72,7 @@ class Notes:
                 break
 
         if clicked_key is not None:
-            self.edited_label = self.labels[clicked_key] # Store the clicked label
+            self.edited_label = self.labels[clicked_key]  # Store the clicked label
             self.opened_note_text = self.labels[clicked_key]
 
             # Open the notes window and update label text
@@ -102,7 +105,7 @@ class Notes:
         if new_note is None:
             new_note = self.note_box.get("1.0", ctk.END)
             self.saved_note = new_note
-            self.new_label = ctk.CTkLabel(self.main_frame, text=new_note)
+            self.new_label = ctk.CTkLabel(self.note_container_frame, text=new_note)
             self.new_label.bind("<Button-1>", self.label_clicked)
             self.new_label.pack()
             self.labels[self.label_count] = self.new_label
@@ -111,6 +114,11 @@ class Notes:
             self.notes_window.destroy()
 
         self.note_box.delete("1.0", ctk.END)
+        self.label_update()
+
+    def label_update(self):
+        for label_key, label_widget in self.labels.items():
+            label_widget.configure(font=(self.font, 12), padx=10, pady=10, wraplength=200, justify=ctk.LEFT)
 
 
 if __name__ == "__main__":
